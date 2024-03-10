@@ -35,18 +35,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import uni.dev.doctorlink.R
 import uni.dev.doctorlink.ui.theme.Gray
 import uni.dev.doctorlink.ui.theme.Gray_2
 import uni.dev.doctorlink.ui.theme.Gray_3
 import uni.dev.doctorlink.ui.theme.Gray_4
-import uni.dev.doctorlink.ui.theme.Primary_2
-import uni.dev.doctorlink.ui.theme.Primary_3
 import uni.dev.doctorlink.ui.theme.Red
 import uni.dev.doctorlink.ui.theme.Text2
 import uni.dev.doctorlink.ui.theme.Text2_2
@@ -54,8 +50,9 @@ import uni.dev.doctorlink.ui.theme.Text2_2
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmsCodeView() {
-    val phoneNumber = remember {
-        mutableStateOf("+998913264895")
+    val codeLength = 5
+    val username = remember {
+        mutableStateOf("@aliyev123")
     }
     val code = remember {
         mutableStateOf("")
@@ -63,28 +60,27 @@ fun SmsCodeView() {
     val codeError = remember {
         mutableStateOf(false)
     }
-    val min = remember {
-        mutableStateOf(3)
+    var min = 3
+    var sec = 0
+    val time = remember {
+        mutableStateOf("$min:00")
     }
-    val sec = remember {
-        mutableStateOf(0)
-    }
-    LaunchedEffect(Unit){
-        while (true){
+
+    LaunchedEffect(Unit) {
+        while (true) {
             delay(1000)
-            if (sec.value > 0) sec.value.minus(1)
+            if (sec > 0) sec-=1
             else {
-                if (min.value > 0){
-                    min.value.minus(1)
-                    sec.value = 59
-                }else{
+                if (min > 0) {
+                    min-=1
+                    sec = 59
+                } else {
                     // TODO: GO BACK
 //                navController.back()
                 }
             }
-//            if (time.value == 0){
-//
-//            }
+            time.value = if (sec > 10) "${min}:${sec}"
+            else "$min:0$sec"
         }
     }
 
@@ -92,6 +88,7 @@ fun SmsCodeView() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
+//            .background(Color.White)
     ) {
         TopAppBar(title = { }, navigationIcon = {
             IconButton(onClick = { }) {
@@ -117,7 +114,7 @@ fun SmsCodeView() {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Telegram bot orqali ${phoneNumber.value} ga yuborilgan tasdiqlash kodini kiriting",
+                text = "Telegram bot orqali ${username.value} ga yuborilgan tasdiqlash kodini kiriting",
                 color = Gray,
                 modifier = Modifier.padding(horizontal = 42.dp),
                 textAlign = TextAlign.Center
@@ -125,27 +122,36 @@ fun SmsCodeView() {
 
             Spacer(modifier = Modifier.height(28.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                for (index in 0 until 4) {
+                for (index in 0 until codeLength) {
                     Card(
-                        modifier = Modifier.padding(horizontal = 6.dp),
-                        colors = CardDefaults.cardColors(Gray_4),
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .width(60.dp),
+                        colors = CardDefaults.cardColors(Color.White),
                         border = BorderStroke(
                             1.5.dp, if (codeError.value) Red else Gray_3
-                        //                                Color(                                0xFFE7E7E7)
-                        ), shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(3.dp)
+                            //                                Color(                                0xFFE7E7E7)
+                        ),
+                        shape = RoundedCornerShape(16.dp),
+//                        elevation = CardDefaults.cardElevation(3.dp)
                     ) {
                         Text(
                             text = if (code.value.length > index) code.value[index].toString() else "5",
                             fontSize = 36.sp,
                             modifier = Modifier
-                                .padding(horizontal = 18.dp, vertical = 18.dp),
+                                .padding(vertical = 18.dp)
+                                .align(Alignment.CenterHorizontally),
                             color = if (code.value.length > index) Text2 else Color.Transparent
                         )
                     }
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-//            Text(text = )
+            Text(
+                text = time.value,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
 //            Spacer(modifier = Modifier.height(12.dp))
         }
         Column(
@@ -161,7 +167,7 @@ fun SmsCodeView() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 for (i in 1 until 4) {
-                    NumberButton(i.toString(), false, code)
+                    NumberButton(i.toString(), false, code, codeLength)
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -172,7 +178,7 @@ fun SmsCodeView() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 for (i in 4 until 7) {
-                    NumberButton(i.toString(), false, code)
+                    NumberButton(i.toString(), false, code, codeLength)
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -183,7 +189,7 @@ fun SmsCodeView() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 for (i in 7 until 10) {
-                    NumberButton(i.toString(), false, code)
+                    NumberButton(i.toString(), false, code, codeLength)
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -193,22 +199,22 @@ fun SmsCodeView() {
                     .weight(1f),
                 horizontalArrangement = Arrangement.Center
             ) {
-                NumberButton("", false, code)
-                NumberButton("0", false, code)
-                NumberButton("1", true, code)
+                NumberButton("", false, code, codeLength)
+                NumberButton("0", false, code, codeLength)
+                NumberButton("1", true, code, codeLength)
             }
         }
     }
 }
 
 @Composable
-fun NumberButton(num: String, b: Boolean, code: MutableState<String>) {
+fun NumberButton(num: String, b: Boolean, code: MutableState<String>, codeLength: Int) {
     Button(
         onClick = {
             if (b) {
                 if (code.value.isNotEmpty()) code.value = code.value.dropLast(1)
             } else {
-                if (code.value.length < 4) code.value += num
+                if (code.value.length < codeLength) code.value += num
             }
         },
         modifier = Modifier

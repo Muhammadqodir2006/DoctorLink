@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 val Primary = Color(0xFF5cce7a)
 val Primary_2 = Color(0x995CCE7A)
 val Primary_3 = Color(0x335CCE7A)
+val Primary_4 = Color(0x33ABFFC1)
 val Gray = Color(0xFFB9B9B9)
 val Gray_2 = Color(0xFFE0E0E0)
 val Gray_3 = Color(0xFFF1F1F1)

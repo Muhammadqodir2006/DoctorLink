@@ -19,6 +19,6 @@ class SplashViewModel(private val navController: NavHostController) {
             return  Screen.Welcome.route
         }
         // TODO: Check user login
-        return  Screen.PhoneNumber.route
+        return  Screen.TelegramUser.route
     }
 }

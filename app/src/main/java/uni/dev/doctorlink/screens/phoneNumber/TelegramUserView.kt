@@ -3,6 +3,7 @@ package uni.dev.doctorlink.screens.phoneNumber
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,11 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import uni.dev.doctorlink.R
 import uni.dev.doctorlink.ui.theme.Gray
 import uni.dev.doctorlink.ui.theme.Gray_2
@@ -33,38 +36,44 @@ import uni.dev.doctorlink.ui.theme.Gray_3
 import uni.dev.doctorlink.ui.theme.Primary
 import uni.dev.doctorlink.ui.theme.Primary_3
 import uni.dev.doctorlink.ui.theme.Red
-import uni.dev.doctorlink.util.PhoneVisualTransformation
+import uni.dev.doctorlink.ui.theme.Text2
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhoneNumberView() {
-    val phoneNumber = remember {
+fun TelegramUserView() {
+    val telegramUsername = remember {
         mutableStateOf("")
     }
-    val phoneNumberError = remember {
+    val telegramUsernameError = remember {
         mutableStateOf(false)
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.weight(0.8f))
-        Icon(painter = painterResource(id = R.drawable.phone_sms_demo), contentDescription = "", tint = Gray_2, modifier = Modifier.size(100.dp))
+        Icon(
+            painter = painterResource(id = R.drawable.telegram),
+            contentDescription = "",
+            tint = Gray_2,
+            modifier = Modifier.size(100.dp)
+        )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Tasdiqlash kodini olish uchun telefon raqamingizni kiriting",
+            text = "Tasdiqlash kodini olish uchun telegram username kiriting",
             color = Gray,
             modifier = Modifier.padding(horizontal = 42.dp),
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
-            value = phoneNumber.value,
+            value = telegramUsername.value,
             onValueChange = {
-                if (it.length < 10) {
-                    phoneNumber.value = it
+                if (it.length <= 32) {
+                    telegramUsername.value = it
                 }
-                if (phoneNumberError.value) phoneNumberError.value = false
+                if (telegramUsernameError.value) telegramUsernameError.value = false
             },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
             singleLine = true,
             maxLines = 1,
             shape = RoundedCornerShape(20.dp),
@@ -74,24 +83,30 @@ fun PhoneNumberView() {
             ),
             leadingIcon = {
                 Icon(
-                    painterResource(id = R.drawable._998),
+                    painterResource(id = R.drawable.at_sign),
                     contentDescription = "",
-                    modifier = Modifier.padding(start = 24.dp, end = 16.dp)
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                        .size(18.dp),
+                    tint = Text2
                 )
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            visualTransformation = PhoneVisualTransformation("00 000 00 00", '0')
+            placeholder = { Text(text = "aliyev123", color = Gray)},
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            textStyle = TextStyle(fontSize = 18.sp)
         )
         Spacer(modifier = Modifier.height(2.dp))
-        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally){
-            if (phoneNumberError.value) Text(
-                text = "Raqam noto'g'ri kiritilgan",
-                color = Red
+        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (telegramUsernameError.value) Text(
+                text = "Username 5-32 uzunlikdagi raqam va harflardan iborat bo'lishi kerak",
+                color = Red,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 24.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
             ElevatedButton(
                 onClick = {
-                    phoneNumberError.value = true
+                    telegramUsernameError.value = true
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 shape = RoundedCornerShape(16.dp),

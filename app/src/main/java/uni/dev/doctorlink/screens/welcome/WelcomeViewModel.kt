@@ -20,7 +20,7 @@ class WelcomeViewModel(val navController: NavController) {
     fun navigate(context: Context) {
         val sharedHelper = SharedHelper(context)
         sharedHelper.setWelcome()
-        navController.navigate(Screen.PhoneNumber.route){
+        navController.navigate(Screen.TelegramUser.route){
             popUpTo(navController.graph.id)
         }
     }

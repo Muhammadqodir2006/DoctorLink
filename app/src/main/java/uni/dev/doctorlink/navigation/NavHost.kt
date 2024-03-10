@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import uni.dev.doctorlink.screens.main.MainView
-import uni.dev.doctorlink.screens.phoneNumber.PhoneNumberView
+import uni.dev.doctorlink.screens.phoneNumber.TelegramUserView
 import uni.dev.doctorlink.screens.smsCode.SmsCodeView
 import uni.dev.doctorlink.screens.splash.SplashView
 import uni.dev.doctorlink.screens.splash.SplashViewModel
@@ -26,8 +26,8 @@ fun NavigationHost(navController: NavHostController) {
             val welcomeViewModel = WelcomeViewModel(navController)
             WelcomeView(welcomeViewModel)
         }
-        composable(route = Screen.PhoneNumber.route) {
-            PhoneNumberView()
+        composable(route = Screen.TelegramUser.route) {
+            TelegramUserView()
         }
         composable(route = Screen.SmsCode.route) {
             SmsCodeView()

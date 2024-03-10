@@ -13,6 +13,7 @@ import uni.dev.doctorlink.items.ShowDIs
 import uni.dev.doctorlink.navigation.NavigationHost
 import uni.dev.doctorlink.screens.doctor.DoctorView
 import uni.dev.doctorlink.screens.main.MainView
+import uni.dev.doctorlink.screens.smsCode.SmsCodeView
 import uni.dev.doctorlink.screens.welcome.WelcomeView
 import uni.dev.doctorlink.screens.welcome.WelcomeViewModel
 import uni.dev.doctorlink.ui.theme.DoctorLinkTheme
@@ -28,9 +29,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 //                    NavigationHost(navController)
-//                    MainView(rememberNavController())
+                    MainView(rememberNavController())
 //                    WelcomeView(welcomeViewModel = WelcomeViewModel(navController))
-                    DoctorView(navController)
+//                    DoctorView(navController)
+//                    SmsCodeView()
                 }
             }
         }
