@@ -19,11 +19,10 @@ import uni.dev.doctorlink.R
 @Composable
 fun SplashView(splashViewModel: SplashViewModel) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_anim))
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         delay(3600)
-        splashViewModel.navigate(context)
+        splashViewModel.navigate()
     }
     Column(
         verticalArrangement = Arrangement.Center,

@@ -16,6 +16,7 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -39,7 +40,7 @@ import uni.dev.doctorlink.ui.theme.Text2
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun WelcomeView(welcomeViewModel: WelcomeViewModel) {
-    val pagerState = rememberPagerState(WelcomePages.size)
+    val pagerState = rememberPagerState(0)
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -47,7 +48,7 @@ fun WelcomeView(welcomeViewModel: WelcomeViewModel) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        HorizontalPager(pagerState, modifier = Modifier.weight(1f)) { index ->
+        HorizontalPager(WelcomePages.size, modifier = Modifier.weight(1f), state = pagerState) { index ->
             OnboardingPageContent(WelcomePages[index])
         }
 
@@ -69,7 +70,7 @@ fun WelcomeView(welcomeViewModel: WelcomeViewModel) {
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
-            ElevatedButton(
+            TextButton(
                 onClick = {
                     if (pagerState.currentPage == WelcomePages.lastIndex) {
                         welcomeViewModel.navigate(context)
@@ -78,17 +79,15 @@ fun WelcomeView(welcomeViewModel: WelcomeViewModel) {
                     }
 
                 },
-                elevation = ButtonDefaults.elevatedButtonElevation(
-                    defaultElevation = 1.dp,
-                    pressedElevation = 0.dp
-                ),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
                 Text(
-                    text = if (pagerState.currentPage == WelcomePages.lastIndex) "Boshlash" else "Keyingisi",
+                    text = if (pagerState.currentPage == WelcomePages.lastIndex) "Boshlash" else "Keyingi",
                     color = Color.White,
-                    modifier = Modifier.padding(horizontal = 48.dp)
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(vertical = 6.dp)
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))

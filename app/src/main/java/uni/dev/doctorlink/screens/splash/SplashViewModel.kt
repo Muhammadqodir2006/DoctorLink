@@ -5,8 +5,9 @@ import androidx.navigation.NavHostController
 import uni.dev.doctorlink.navigation.Screen
 import uni.dev.doctorlink.util.SharedHelper
 
-class SplashViewModel(private val navController: NavHostController) {
-    fun navigate(context: Context) {
+class SplashViewModel(private val navController: NavHostController, private val context: Context) {
+
+    fun navigate() {
         val route = getRoute(context)
         navController.navigate(route) {
             popUpTo(navController.graph.id)
@@ -15,10 +16,10 @@ class SplashViewModel(private val navController: NavHostController) {
 
     private fun getRoute(context: Context): String {
         val sharedHelper = SharedHelper.getInstance(context)
-        if (sharedHelper.showWelcome()){
-            return  Screen.Welcome.route
+        if (sharedHelper.showWelcome()) {
+            return Screen.Welcome.route
         }
-        // TODO: Check user login
-        return  Screen.TelegramUser.route
+        return if (sharedHelper.getUser() == null)
+            Screen.TelegramUser.route else Screen.Main.route
     }
 }
