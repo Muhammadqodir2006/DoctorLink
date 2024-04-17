@@ -1,22 +1,22 @@
 package uni.dev.doctorlink.screens.userDetails
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import uni.dev.doctorlink.model.Region
+import uni.dev.doctorlink.model.User
 import uni.dev.doctorlink.navigation.Screen
+import uni.dev.doctorlink.util.Api
+import uni.dev.doctorlink.util.SharedHelper
 
-class UserDetailsViewModel(val navController: NavController) {
+class UserDetailsViewModel(val navController: NavController, val phone: String, val context: Context) {
 
     private var _name = MutableLiveData("")
     var name : LiveData<String> =_name
 
     private var _surname = MutableLiveData("")
     var surname : LiveData<String> =_surname
-
-    private var _gender = MutableLiveData(true)
-    var gender : LiveData<Boolean> =_gender
 
     private var _birthYear = MutableLiveData(0)
     var birthYear :LiveData<Int> = _birthYear
@@ -26,6 +26,14 @@ class UserDetailsViewModel(val navController: NavController) {
 
     private val _dialogContent = MutableLiveData(0)
     val dialogContent :LiveData<Int> = _dialogContent
+
+    private val _region = MutableLiveData(Region(-1, ""))
+    val region :LiveData<Region> = _region
+
+    private val _loading = MutableLiveData(false)
+    val loading :LiveData<Boolean> = _loading
+
+
 
     fun updateName(new: String){
         if (new.length <= 35) {
@@ -47,11 +55,7 @@ class UserDetailsViewModel(val navController: NavController) {
         }
     }
 
-    fun updateGender(new: Boolean) {
-        _gender.value = new
-    }
-
-    fun updateBirtYear(year: Int) {
+    fun updateBirthYear(year: Int) {
         _birthYear.value = year
     }
 
@@ -60,9 +64,19 @@ class UserDetailsViewModel(val navController: NavController) {
     }
 
     fun onContinue() {
-        // TODO
-        navController.navigate(Screen.Main.route)
+        _loading.value = true
+        Api.register(User(name = _name.value, surname = _surname.value, phone = phone, birthyear = _birthYear.value, regionId = _region.value!!.id)){
+            SharedHelper.getInstance(context).login(it)
+            _loading.value = false
+            navController.navigate(Screen.Main.route){
+                popUpTo(navController.graph.id){
+                    inclusive = true
+                }
+            }
+        }
     }
 
-
+    fun updateRegion(reg: Region) {
+        _region.value = reg
+    }
 }

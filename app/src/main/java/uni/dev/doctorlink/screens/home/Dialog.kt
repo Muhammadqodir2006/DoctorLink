@@ -21,12 +21,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uni.dev.doctorlink.ui.theme.Gray_4
+import uni.dev.doctorlink.util.Api
 
 @Composable
 fun HomeDialog(vm: HomeViewModel){
     val dialogContent = vm.dialogContent.observeAsState().value!!
     AlertDialog(
-        onDismissRequest = { vm.closeDialog() },
+        onDismissRequest = { vm.closeRegionDialog() },
         confirmButton = { },
         text = {
             when (dialogContent) {
@@ -39,24 +40,9 @@ fun HomeDialog(vm: HomeViewModel){
 
 @Composable
 fun LocationDialogContent(vm: HomeViewModel) {
-    val location = vm.location.observeAsState().value!!
+    val location = vm.region.observeAsState().value!!
     LazyColumn {
-        val locations = listOf(
-            "Toshkent shahar",
-            "Qoraqalpog'iston Respublikasi",
-            "Toshkent viloyati",
-            "Farg'ona viloyati",
-            "Andijon viloyati",
-            "Namangan viloyati",
-            "Sirdaryo viloyati",
-            "Xorazm viloyati",
-            "Jizzax viloyati",
-            "Samarqand viloyati",
-            "Buxoro viloyati",
-            "Surxondaryo viloyati",
-            "Qashqadaryo viloyati",
-            "Navoiy viloyati"
-        )
+        val locations = Api.getRegions()
         items(locations) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,12 +50,12 @@ fun LocationDialogContent(vm: HomeViewModel) {
                     .clip(RoundedCornerShape(8.dp))
                     .clickable {
                         vm.changeLocation(it)
-                        vm.closeDialog()
+                        vm.closeRegionDialog()
                     }
                     .background(if (it == location) Gray_4 else Color.Transparent)
             ) {
                 Text(
-                    text = it,
+                    text = it.name!!,
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

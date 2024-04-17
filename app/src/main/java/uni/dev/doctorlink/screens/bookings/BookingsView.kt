@@ -1,7 +1,9 @@
 package uni.dev.doctorlink.screens.bookings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,48 +13,47 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import uni.dev.doctorlink.R
+import uni.dev.doctorlink.component.Dialog
 import uni.dev.doctorlink.items.BookingItem
 import uni.dev.doctorlink.ui.theme.Blue
 import uni.dev.doctorlink.ui.theme.Gray_2
-import uni.dev.doctorlink.ui.theme.Text_2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingsView(vm: BookingsViewModel) {
-    val filter = vm.filter.observeAsState().value!!
-    Column(
-        Modifier
-            .fillMaxSize()
-    ) {
-        TopAppBar(title = {
-            Text(
-                text = "Tibbiy ko'riklar",
-                fontSize = 20.sp,
-                color = Text_2,
-                fontWeight = FontWeight.W700
-            )
-        })
+    val showActive = vm.showActive.observeAsState().value!!
+    val activeBookings = vm.activeBookings.observeAsState().value!!
+    val passiveBookings = vm.passiveBookings.observeAsState().value!!
+    val loadingActive = vm.loadingActive.observeAsState().value!!
+    val loadingPassive = vm.loadingPassive.observeAsState().value!!
+    val showDeleteDialog = vm.showDeleteDialog.observeAsState().value!!
 
+    Column(
+        Modifier.fillMaxSize()
+    ) {
+        Spacer(modifier = Modifier.height(6.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Card(
-                onClick = { vm.updateFilter(1) },
+                onClick = { vm.showActive() },
                 shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp),
                 modifier = Modifier.width(120.dp),
-                colors = CardDefaults.cardColors(if (filter == 1) Blue else Gray_2)
+                colors = CardDefaults.cardColors(if (showActive) Blue else Gray_2)
             ) {
                 Text(
                     text = "Kelasi",
@@ -69,10 +70,10 @@ fun BookingsView(vm: BookingsViewModel) {
                     .background(Color.White)
             )
             Card(
-                onClick = { vm.updateFilter(2) },
+                onClick = { vm.showPassive() },
                 shape = RoundedCornerShape(bottomEnd = 12.dp, topEnd = 12.dp),
                 modifier = Modifier.width(120.dp),
-                colors = CardDefaults.cardColors(if (filter == 2) Blue else Gray_2)
+                colors = CardDefaults.cardColors(if (!showActive) Blue else Gray_2)
             ) {
                 Text(
                     text = "O'tgan",
@@ -84,10 +85,52 @@ fun BookingsView(vm: BookingsViewModel) {
                 )
             }
         }
-        LazyColumn(Modifier.padding(horizontal = 12.dp)) {
-            items(10) {
-                BookingItem()
+        Spacer(modifier = Modifier.height(6.dp))
+        if (showActive) if (loadingActive) Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            CircularProgressIndicator(Modifier.align(Alignment.Center))
+        }
+        else if (activeBookings.isEmpty()) Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            Text(text = "Ko'riklar yo'q", modifier = Modifier.align(Alignment.Center))
+        } else LazyColumn(Modifier.padding(horizontal = 12.dp)) {
+            items(activeBookings) {
+                BookingItem(booking = it, active = true, forComment = false, onDelete = {vm.openDeleteDialog(it.key!!)}, onMakeCommented = { }, onComment = {})
             }
+        }
+        else if (loadingPassive) Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            CircularProgressIndicator(Modifier.align(Alignment.Center))
+        } else if (passiveBookings.isEmpty()) Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            Text(text = "Ko'riklar yo'q", modifier = Modifier.align(Alignment.Center))
+        } else LazyColumn(Modifier.padding(horizontal = 12.dp)) {
+            items(passiveBookings) {
+                BookingItem(
+                    booking = it,
+                    active = false,
+                    forComment = false,
+                    onDelete = { vm.openDeleteDialog(it.key!!) },
+                    onMakeCommented = { },
+                    onComment = {})
+            }
+        }
+    }
+    AnimatedVisibility(visible = showDeleteDialog) {
+        Dialog(text = "Tibbiy ko'rikni bekor qilmoqchimisiz?", icon = painterResource(R.drawable.alert), onDismiss = { vm.closeDeleteDialog() }) {
+            vm.deleteBooking()
         }
     }
 }

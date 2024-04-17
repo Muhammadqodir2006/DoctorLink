@@ -3,6 +3,7 @@ package uni.dev.doctorlink.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val Primary = Color(0xFF5cce7a)
+val Background = Color(1f, 1f, 1f, .5f)
 val Primary_2 = Color(0x995CCE7A)
 val Primary_3 = Color(0x335CCE7A)
 val Primary_4 = Color(0x33ABFFC1)

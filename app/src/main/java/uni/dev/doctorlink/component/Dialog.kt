@@ -15,13 +15,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
-import uni.dev.doctorlink.R
 import uni.dev.doctorlink.ui.theme.Red
+import uni.dev.doctorlink.ui.theme.Red_2
 
 @Composable
-fun ExitDialog(onDismiss:() -> Unit, onConfirm:()->Unit) {
+fun Dialog(
+    text: String,
+    icon: Painter,
+    iconTint: Color? = null,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -34,8 +40,12 @@ fun ExitDialog(onDismiss:() -> Unit, onConfirm:()->Unit) {
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss, shape = RoundedCornerShape(12.dp)) {
-                Text(text = "Yo'q")
+            TextButton(
+                onClick = onDismiss,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.textButtonColors(containerColor = Color(0f, 0f, 0f, .03f))
+            ) {
+                Text(text = "Bekor qilish", color = Color(0f, 0f, 0f, .2f))
             }
         },
         containerColor = Color.White,
@@ -45,13 +55,13 @@ fun ExitDialog(onDismiss:() -> Unit, onConfirm:()->Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.alert),
+                    painter = icon,
                     modifier = Modifier.size(64.dp),
                     contentDescription = "",
-                    tint = Red
+                    tint = iconTint ?: Red_2
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-                Text(text = "Chiqishni xohlaysizmi?")
+                Text(text = text)
             }
         },
     )

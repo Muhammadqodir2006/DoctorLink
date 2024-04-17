@@ -13,13 +13,14 @@ class SplashViewModel(private val navController: NavHostController, private val 
             popUpTo(navController.graph.id)
         }
     }
+    init {
+        if (SharedHelper.getInstance(context).getDeleteUser()) SharedHelper.getInstance(context).setDeleteUser(false)
+    }
 
     private fun getRoute(context: Context): String {
         val sharedHelper = SharedHelper.getInstance(context)
-        if (sharedHelper.showWelcome()) {
-            return Screen.Welcome.route
-        }
-        return if (sharedHelper.getUser() == null)
-            Screen.TelegramUser.route else Screen.Main.route
+        if (sharedHelper.showWelcome()) return Screen.Welcome.route
+        return if (sharedHelper.getUser().key == null)
+            Screen.PhoneNumber.route else Screen.Main.route
     }
 }

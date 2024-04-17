@@ -1,5 +1,6 @@
 package uni.dev.doctorlink.screens.smsCode
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -31,18 +32,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
 import uni.dev.doctorlink.R
-import uni.dev.doctorlink.component.ExitDialog
+import uni.dev.doctorlink.component.Dialog
+import uni.dev.doctorlink.component.ProgressIndicator
 import uni.dev.doctorlink.ui.theme.Gray
 import uni.dev.doctorlink.ui.theme.Gray_2
 import uni.dev.doctorlink.ui.theme.Gray_3
@@ -50,13 +57,18 @@ import uni.dev.doctorlink.ui.theme.Gray_4
 import uni.dev.doctorlink.ui.theme.Red
 import uni.dev.doctorlink.ui.theme.Text2
 import uni.dev.doctorlink.ui.theme.Text2_2
-
+@Preview
+@Composable
+fun s(){
+    SmsCodeView(navController = rememberNavController(), vm = SmsCodeViewModel(rememberNavController(), "", "", LocalContext.current))
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmsCodeView(navController: NavHostController, vm: SmsCodeViewModel) {
     val code = vm.code.observeAsState().value!!
     val codeError = vm.codeError.observeAsState().value!!
     val dialogOpen = vm.dialogOpen.observeAsState().value!!
+    val loading = vm.loading.observeAsState().value!!
     val borderColor = animateColorAsState(
         targetValue = if (codeError) Red else Gray_3,
         animationSpec = tween(300),
@@ -69,6 +81,13 @@ fun SmsCodeView(navController: NavHostController, vm: SmsCodeViewModel) {
     BackHandler {
         if (dialogOpen) vm.closeDialog()
         else vm.openDialog()
+    }
+    LaunchedEffect(key1 = "smsCodeView_LaunchedEffect") {
+        while (true){
+            Log.d("TAG", "SmsCodeView: 1 second elapsed")
+            delay(1000)
+            vm.timeMinus()
+        }
     }
 
     Column(
@@ -103,19 +122,18 @@ fun SmsCodeView(navController: NavHostController, vm: SmsCodeViewModel) {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Telegram bot orqali ${vm.username} ga yuborilgan tasdiqlash kodini kiriting",
+                text = "+998 ${vm.phone} ga sms orqali yuborilgan tasdiqlash kodini kiriting",
                 color = Gray,
                 modifier = Modifier.padding(horizontal = 42.dp),
                 textAlign = TextAlign.Center
             )
-
             Spacer(modifier = Modifier.height(28.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 for (index in 0 until vm.codeLength) {
                     Card(
                         modifier = Modifier
                             .padding(horizontal = 4.dp)
-                            .width(60.dp),
+                            .width(50.dp),
                         colors = CardDefaults.cardColors(Color.White),
                         border = BorderStroke(
                             1.5.dp, color = borderColor.value
@@ -135,8 +153,8 @@ fun SmsCodeView(navController: NavHostController, vm: SmsCodeViewModel) {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(12.dp))
-//            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
         }
         Column(
             modifier = Modifier
@@ -190,10 +208,15 @@ fun SmsCodeView(navController: NavHostController, vm: SmsCodeViewModel) {
         }
     }
     AnimatedVisibility(visible = dialogOpen) {
-        ExitDialog(
+        Dialog(
+            text = "Chiqmoqchimisiz?",
+            icon = painterResource(id = R.drawable.alert),
             onDismiss = { vm.closeDialog() },
             onConfirm = { navController.popBackStack() }
         )
+    }
+    AnimatedVisibility(visible = loading) {
+        ProgressIndicator()
     }
 }
 

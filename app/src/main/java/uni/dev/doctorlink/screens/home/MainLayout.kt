@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +27,13 @@ import uni.dev.doctorlink.items.HospitalItem
 import uni.dev.doctorlink.ui.theme.Blue
 
 @Composable
-fun MainLayout(vm: HomeViewModel){
+fun MainLayout(vm: HomeViewModel) {
+    val topDoctors = vm.topDoctors.observeAsState().value!!
+    val topHospitals = vm.topHospitals.observeAsState().value!!
+    val loadingTopDoctors = vm.loadingTopDoctors.observeAsState().value!!
+    val loadingTopHospitals = vm.loadingTopHospitals.observeAsState().value!!
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -48,8 +56,8 @@ fun MainLayout(vm: HomeViewModel){
             )
             Box(
                 Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable { }
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable { vm.openAllHospitals() }
             ) {
                 Text(
                     text = "Hammasi",
@@ -61,11 +69,32 @@ fun MainLayout(vm: HomeViewModel){
             }
         }
         Spacer(modifier = Modifier.height(6.dp))
-        Column {
-            for (i in 1..3) {
-                HospitalItem()
+
+        if (loadingTopHospitals) Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+        ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+        else Column {
+            if (topHospitals.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                ) {
+                    Text(text = "Ushbu hududda shifoxonalar topilmadi", modifier = Modifier.align(Alignment.Center))
+                }
+            } else {
+                val len = if (topHospitals.size > 3) 3 else topHospitals.size
+                for (i in 0 until len) {
+                    val h = topHospitals[i]
+                    HospitalItem(vm.user.key!!, h, false, vm.navController)
+                }
             }
         }
+
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             Modifier
@@ -82,8 +111,8 @@ fun MainLayout(vm: HomeViewModel){
             )
             Box(
                 Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable { }
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable { vm.openAllDoctors() }
             ) {
                 Text(
                     text = "Hammasi",
@@ -95,10 +124,31 @@ fun MainLayout(vm: HomeViewModel){
             }
         }
         Spacer(modifier = Modifier.height(6.dp))
-        Column {
-            for (i in 1..5) {
-                DoctorItem()
+        if (loadingTopDoctors) Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+        ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+        else Column {
+            if (topDoctors.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                ) {
+                    Text(text = "Ushbu hududda doktorlar topilmadi", modifier = Modifier.align(Alignment.Center))
+                }
+            } else {
+                val len = if (topDoctors.size > 5) 5 else topDoctors.size
+                for (i in 0 until len) {
+                    val d = topDoctors[i]
+                    DoctorItem(d, vm.user.key!!, vm.navController, false)
+                }
             }
         }
+
+
     }
 }

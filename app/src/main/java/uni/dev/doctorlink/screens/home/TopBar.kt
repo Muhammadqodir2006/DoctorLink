@@ -38,8 +38,9 @@ import uni.dev.doctorlink.ui.theme.Text2
 fun HomeTopBar(
     vm: HomeViewModel
 ) {
-    val location = vm.location.observeAsState().value!!
+    val region = vm.region.observeAsState().value!!
     val notificationCount = vm.notificationCount.observeAsState().value!!
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -64,8 +65,7 @@ fun HomeTopBar(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    vm.openDialog()
-                    vm.updateDialogContent(0)
+                    vm.openRegionDialog()
                 }) {
             Spacer(modifier = Modifier.width(6.dp))
             Icon(
@@ -76,7 +76,7 @@ fun HomeTopBar(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = location,
+                text = region.name!!,
                 color = Text2,
                 modifier = Modifier.padding(vertical = 6.dp),
                 fontWeight = FontWeight.W700

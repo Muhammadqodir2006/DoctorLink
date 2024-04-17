@@ -1,11 +1,10 @@
 package uni.dev.doctorlink.model
 
 data class User(
-    val id: String,
-    var username:String,
-    var name: String,
-    var surname: String,
-    var gender: Boolean,
-    var birthday: String,
-    var region: String
+    var key: String? = null,
+    var phone: String? = null,
+    var name: String? = null,
+    var regionId:Int? = null,
+    var surname: String? = null,
+    var birthyear: Int? = null
 )

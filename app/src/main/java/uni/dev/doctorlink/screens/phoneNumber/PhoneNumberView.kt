@@ -1,6 +1,8 @@
-package uni.dev.doctorlink.screens.telegramUser
+package uni.dev.doctorlink.screens.phoneNumber
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,9 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Phone
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -31,7 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uni.dev.doctorlink.R
-import uni.dev.doctorlink.ui.theme.Blue
+import uni.dev.doctorlink.component.PhoneVisualTransformation
+import uni.dev.doctorlink.component.ProgressIndicator
 import uni.dev.doctorlink.ui.theme.Gray
 import uni.dev.doctorlink.ui.theme.Gray_2
 import uni.dev.doctorlink.ui.theme.Gray_3
@@ -40,36 +44,37 @@ import uni.dev.doctorlink.ui.theme.Primary_3
 import uni.dev.doctorlink.ui.theme.Red
 import uni.dev.doctorlink.ui.theme.Red_2
 import uni.dev.doctorlink.ui.theme.Text2
-import uni.dev.doctorlink.ui.theme.Text2_2
 
 @Composable
-fun TelegramUserView(vm: TelegramUserViewModel) {
-    val username = vm.username.observeAsState().value!!
-    val usernameError = vm.usernameError.observeAsState().value!!
-    val usernameErrorText = vm.usernameErrorText.observeAsState().value!!
-    val dialogOpen = vm.dialogOpen.observeAsState().value!!
+fun PhoneNumberView(vm: PhoneNumberViewModel) {
+    val phone = vm.phone.observeAsState().value!!
+    val phoneError = vm.usernameError.observeAsState().value!!
+    val loading = vm.loading.observeAsState().value!!
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
-        .padding(horizontal = 32.dp)) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp)
+    ) {
         Spacer(modifier = Modifier.weight(0.8f))
         Icon(
-            painter = painterResource(id = R.drawable.telegram),
+            Icons.Rounded.Phone,
             contentDescription = "",
             tint = Gray_2,
             modifier = Modifier.size(100.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Tasdiqlash kodini olish uchun telegram username kiriting",
+            text = "Tasdiqlash kodini olish uchun telefon raqam kiriting",
             color = Gray,
             modifier = Modifier.padding(horizontal = 24.dp),
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
-            value = username,
+            value = phone,
             onValueChange = {
-                vm.updateUsername(it)
+                vm.updatePhone(it)
             },
             modifier = Modifier
                 .fillMaxWidth(),
@@ -79,22 +84,25 @@ fun TelegramUserView(vm: TelegramUserViewModel) {
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = Gray_3,
                 focusedBorderColor = Primary_3,
-                errorBorderColor = Red_2
+                errorBorderColor = Red_2,
+                focusedTextColor = Text2,
+                unfocusedTextColor = Text2
             ),
-            isError = usernameError,
+            isError = phoneError,
             leadingIcon = {
                 Icon(
-                    painterResource(id = R.drawable.at_sign),
+                    painterResource(id = R.drawable._998),
                     contentDescription = "",
                     modifier = Modifier
-                        .padding(start = 20.dp)
-                        .size(18.dp),
+                        .padding(start = 20.dp, end = 12.dp)
+                        .size(36.dp),
                     tint = Text2
                 )
             },
-            placeholder = { Text(text = "aliyev123", color = Gray) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            textStyle = TextStyle(fontSize = 18.sp)
+            placeholder = { Text(text = "-- --- -- --", color = Gray) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            textStyle = TextStyle(fontSize = 18.sp),
+            visualTransformation = PhoneVisualTransformation("00 000 00 00", '0')
         )
         Spacer(modifier = Modifier.height(6.dp))
         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -104,14 +112,16 @@ fun TelegramUserView(vm: TelegramUserViewModel) {
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
             ) {
-                Text(text = "Kod yuborish", fontWeight = FontWeight.W700, fontSize = 15.sp)
+                Text(text = "Kod yuborish", fontSize = 15.sp)
             }
             Spacer(modifier = Modifier.height(6.dp))
-            AnimatedVisibility(visible = usernameError) {
-                if (usernameError) Text(
-                    text = usernameErrorText,
+            AnimatedVisibility(visible = phoneError) {
+                if (phoneError) Text(
+                    text = "Telefon raqami noto'g'ri kiritilgan",
                     color = Red,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 24.dp)
@@ -119,19 +129,7 @@ fun TelegramUserView(vm: TelegramUserViewModel) {
             }
         }
     }
-    AnimatedVisibility(visible = dialogOpen) {
-        AlertDialog(onDismissRequest = { vm.closeDialog() }, confirmButton = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(vertical = 16.dp)) {
-                Icon(painterResource(id = R.drawable.telegram), contentDescription = "", modifier = Modifier.size(96.dp), tint = Blue)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Tasdiqlash kodini olish uchun botga start bering", fontWeight = FontWeight.W400, textAlign = TextAlign.Center, fontSize = 18.sp, color = Text2_2)
-                Spacer(modifier = Modifier.height(16.dp))
-                TextButton(onClick = { vm.openTelegram() }, colors = ButtonDefaults.textButtonColors(containerColor = Blue), shape = RoundedCornerShape(16.dp)) {
-                    Text(text = "Telegramni ochish", color = Color.White, modifier = Modifier.padding(horizontal = 16.dp))
-                }
-            }
-        }, containerColor = Color.White, modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp))
+    AnimatedVisibility(visible = loading) {
+        ProgressIndicator()
     }
 }
